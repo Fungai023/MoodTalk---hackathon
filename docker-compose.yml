@@ -11,6 +11,9 @@ services:
       - 443:443
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      - keycloak
+
   db:
     image: mysql:8.4
     restart: always
@@ -28,17 +31,19 @@ services:
         target: /docker-entrypoint-initdb.d
     ports:
       - 3306:3306
+
   mailhog:
     image: mailhog/mailhog:latest
     restart: always
     ports:
       - 1025:1025 # smtp server
       - 8025:8025 # web ui
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.5
     environment:
       kc_db: mysql
-      kc_db_url: jdbc:mysql://host.docker.internal:3306/keycloak
+      kc_db_url: jdbc:mysql://db:3306/keycloak
       kc_db_username: planner
       kc_db_password: password1234
       KEYCLOAK_USER: admin
